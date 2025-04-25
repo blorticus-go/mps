@@ -5,16 +5,57 @@ Framework for working with message-oriented protocols.
 ## Overview
 
 ```go
-type MessageExtractor interface {
-    ExtractPendingMessages() ([][]byte, error)
+import (
+    "net"
+    "github.com/blorticus-go/mps"
+    "binary/encoding"
+    "fmt"
+)
+
+func radiusMessageLengthExtractor(accumulatedData []byte) (lengthOfNextMessage uint64, err error) {
+    if len(accumulatedData < 4) {
+        return 0, nil
+    }
+
+    len := binary.BigEndian.Uint16(accumulatedData[2:4])
+    if len > 4096 {
+        return 0, mps.MaximumAllowedLengthExceededError
+    }
+
+    if len < 20 {
+        return 0, fmt.Errorf("minimum length must be >= 20, length value is (%d)", len)
+    }
+
+    return len, nil
 }
 
-type StreamExtractor struct {}
+func respondToMessage(encodedMessage []byte, conn net.Conn) {
+    // ...
+}
 
-func NewStreamExtractor(streamReader io.Reader, lengthExtractor func(accumulatedData []byte) (length u64, err error)) *StreamExtractor {}
-func (e *StreamExtractor) ExtractPendingMessages() ([][]byte, error)
+func main() {
+    c, err := net.Dial("tcp", "localhost:1812")
+    if err != nil { panic(err) }
 
-type DatagramExtractor struct {}
-func NewDatagramExtractor(datagramReader io.Reader) *DatagramExtractor {}
-func (e *DatagramExtractor) ExtractPendingMessages() ([][]byte, error)
+    extractor := mps.NewStreamExtractor()
+    eventChannel := make(chan *mps.ExtractionEvent)
+
+    go extractor.StartExtracting(eventChannel)
+
+    for {
+        event := <-eventChannel
+
+        switch event.Type {
+            case mps.MessageReceived:
+                respondToMessage(event.Message, c)
+
+            case mps.ExtractionError:
+                panic("An error occured while extracting: ", mps.Error)
+
+            case mps.StreamClosed:
+                fmt.Println("stream closed")
+                return
+        }
+    }
+}
 ```
