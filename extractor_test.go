@@ -26,7 +26,7 @@ var _ = Describe("Extractors", func() {
 			}
 
 			reader = mocks.NewReader()
-			streamExtractor = mps.NewStreamExtractor(lengthExtractor)
+			streamExtractor = mps.NewStreamExtractor(lengthExtractor, 100)
 			eventChannel = make(chan *mps.ExtractionEvent)
 		})
 
