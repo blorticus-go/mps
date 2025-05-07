@@ -5,21 +5,35 @@ import (
 	"io"
 )
 
-// ExtractEventType is an enum representing the type of event that can occur during message extraction.
-type ExtractEventType int
+// ExtractionEventType is an enum representing the type of event that can occur during message extraction.
+type ExtractionEventType int
 
 const (
 	// MessageReceived indicates that one more more messages have been successfully extracted.
-	MessageReceived ExtractEventType = iota
+	MessageReceived ExtractionEventType = iota
 	// ExtractionError indicates that an error occurred during the extraction process.
 	ExtractionError
 	// StreamClosed indicates that the stream has been closed.  If the remote closes the stream (for connection-oriented transports), the local connection object is also closed.
 	StreamClosed
 )
 
+// String produces a human-readable string for an ExtractionEventType
+func (t ExtractionEventType) String() string {
+	switch t {
+	case MessageReceived:
+		return "MessageReceived"
+	case ExtractionError:
+		return "ExtractionError"
+	case StreamClosed:
+		return "StreamClosed"
+	}
+
+	return ""
+}
+
 // ExtractionEvent represents an event that occurs during the message extraction process.
 type ExtractionEvent struct {
-	Type    ExtractEventType
+	Type    ExtractionEventType
 	Message []byte
 	Reader  io.Reader
 	Error   error
