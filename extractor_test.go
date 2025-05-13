@@ -41,7 +41,7 @@ var _ = Describe("Extractors", func() {
 				go streamExtractor.StartExtracting(reader, eventChannel)
 
 				event := <-eventChannel
-				Expect(event.Type).To(Equal(mps.StreamClosed))
+				Expect(event.Type).To(Equal(mps.FlowClosed))
 			})
 		})
 
@@ -71,7 +71,7 @@ var _ = Describe("Extractors", func() {
 
 				By("waiting for the second event")
 				event = <-eventChannel
-				Expect(event.Type).To(Equal(mps.StreamClosed))
+				Expect(event.Type).To(Equal(mps.FlowClosed))
 			})
 		})
 
@@ -93,7 +93,7 @@ var _ = Describe("Extractors", func() {
 
 					By("waiting for the second event")
 					event = <-eventChannel
-					Expect(event.Type).To(Equal(mps.StreamClosed))
+					Expect(event.Type).To(Equal(mps.FlowClosed))
 				})
 			})
 
@@ -114,7 +114,7 @@ var _ = Describe("Extractors", func() {
 
 					By("waiting for the second event")
 					event = <-eventChannel
-					Expect(event.Type).To(Equal(mps.StreamClosed))
+					Expect(event.Type).To(Equal(mps.FlowClosed))
 				})
 			})
 		})
@@ -141,7 +141,7 @@ var _ = Describe("Extractors", func() {
 
 					By("waiting for the third event")
 					event = <-eventChannel
-					Expect(event.Type).To(Equal(mps.StreamClosed))
+					Expect(event.Type).To(Equal(mps.FlowClosed))
 				})
 			})
 
@@ -167,7 +167,7 @@ var _ = Describe("Extractors", func() {
 
 					By("waiting for the third event")
 					event = <-eventChannel
-					Expect(event.Type).To(Equal(mps.StreamClosed))
+					Expect(event.Type).To(Equal(mps.FlowClosed))
 				})
 			})
 
@@ -193,7 +193,7 @@ var _ = Describe("Extractors", func() {
 
 					By("waiting for the third event")
 					event = <-eventChannel
-					Expect(event.Type).To(Equal(mps.StreamClosed))
+					Expect(event.Type).To(Equal(mps.FlowClosed))
 				})
 			})
 
@@ -221,7 +221,7 @@ var _ = Describe("Extractors", func() {
 
 					By("waiting for the third event")
 					event = <-eventChannel
-					Expect(event.Type).To(Equal(mps.StreamClosed))
+					Expect(event.Type).To(Equal(mps.FlowClosed))
 				})
 			})
 		})

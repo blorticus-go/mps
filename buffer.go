@@ -115,13 +115,13 @@ func (b *FixedSlidingBuffer) ReadN(data []byte, bytesToCopy int) (int, error) {
 	return bytesToCopy, nil
 }
 
-// WriteSingleReadFrom performs a blocking Read() on source, writing the result into the buffer.  It will only read
+// ReadOnceIntoPendingBuffer performs a blocking Read() on source, writing the result into the buffer.  It will only read
 // up to the size of the unused space in the buffer.  This means, however, that if the head is anywhere but the
 // start of the backing buffer, the remaining bytes must be shifted to the start.  This allows this operation
 // to copy the bytes without an intermediate buffer.  It returns the number of bytes read (and written).  Any
 // error returned by the source Read() is returned here.  This may include EOF.  If the buffer is full before
-// a call to WriteSingleReadFrom, it returns the error BufferLengthExceededError.
-func (b *FixedSlidingBuffer) ReadOnceFrom(source io.Reader) (int, error) {
+// a call to ReadOnceIntoPendingBuffer, it returns the error BufferLengthExceededError.
+func (b *FixedSlidingBuffer) ReadOnceIntoPendingBuffer(source io.Reader) (int, error) {
 	if b.numberOfActiveBytes == len(b.buffer) {
 		return 0, ErrBufferLengthExceeded
 	}

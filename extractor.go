@@ -13,8 +13,8 @@ const (
 	MessageReceived ExtractionEventType = iota
 	// ExtractionError indicates that an error occurred during the extraction process.
 	ExtractionError
-	// StreamClosed indicates that the stream has been closed.  If the remote closes the stream (for connection-oriented transports), the local connection object is also closed.
-	StreamClosed
+	// FlowClosed indicates that the stream has been closed.  If the remote closes the stream (for connection-oriented transports), the local connection object is also closed.
+	FlowClosed
 )
 
 // String produces a human-readable string for an ExtractionEventType
@@ -24,7 +24,7 @@ func (t ExtractionEventType) String() string {
 		return "MessageReceived"
 	case ExtractionError:
 		return "ExtractionError"
-	case StreamClosed:
+	case FlowClosed:
 		return "StreamClosed"
 	}
 
@@ -70,17 +70,6 @@ func NewStreamExtractor(lengthExtractor LengthExtractorMethod, maximumAllowedMes
 	}
 }
 
-// // SetBufferSizeHint is used to set the read buffer size in StartExtracting.  By default, it is 9126.  Each read from the transport reader will return
-// // up to this number of bytes.  This is merely an optimization.  A separate buffer contains data accumulated across reads.  This must be set before
-// // StartExtracting is called to be effective.  It returns the StreamExtractor for method chaining, if desired.
-// func (e *StreamExtractor) SetBufferSizeHint(size int) *StreamExtractor {
-// 	if size > 0 {
-// 		e.bufferSizeHint = size
-// 	}
-//
-// 	return e
-// }
-
 // StartExtracting begins the message extraction process from the reader, which should be a stream-oriented transport.  As events occur, they
 // are sent to the provided eventChannel.  The event type will be MessageReceived if a complete message has been received, ExtractionError if an
 // error occurs, or StreamClosed if the stream has been closed.  The reader will be closed if the remote closes the stream.  On an ExtractionError,
@@ -89,7 +78,7 @@ func (e *StreamExtractor) StartExtracting(reader io.Reader, eventChannel chan<- 
 	pendingDataBuffer := NewFixedSlidingBuffer(e.maximumAllowedMessageLength)
 
 	for {
-		_, err := pendingDataBuffer.ReadOnceFrom(reader)
+		_, err := pendingDataBuffer.ReadOnceIntoPendingBuffer(reader)
 
 		if err != nil && err != io.EOF {
 			eventChannel <- &ExtractionEvent{
@@ -127,7 +116,7 @@ func (e *StreamExtractor) StartExtracting(reader io.Reader, eventChannel chan<- 
 
 		if err == io.EOF {
 			eventChannel <- &ExtractionEvent{
-				Type:   StreamClosed,
+				Type:   FlowClosed,
 				Reader: reader,
 				Error:  err,
 			}
@@ -175,7 +164,7 @@ func (e *DatagramExtractor) StartExtracting(reader io.Reader, eventChannel chan<
 
 		if err == io.EOF {
 			eventChannel <- &ExtractionEvent{
-				Type:   StreamClosed,
+				Type:   FlowClosed,
 				Reader: reader,
 				Error:  err,
 			}

@@ -7,7 +7,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func TestBooks(t *testing.T) {
+func TestMPSSuite(t *testing.T) {
 	RegisterFailHandler(Fail)
 	RunSpecs(t, "MPS Suite")
 }
